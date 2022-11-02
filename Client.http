@@ -1,0 +1,47 @@
+###
+POST http://localhost:8000/api/v1/token/
+accept: application/json
+Content-Type: application/json
+
+{
+  "username": "a",
+  "password": "a"
+}
+
+> {% client.global.set("access_token", response.body.access_token); %}
+
+#### active_template
+
+GET http://localhost:8000/api/v1/user/active_template/
+accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+####
+
+POST http://localhost:8000/api/v1/active_template/
+accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "template_id": "6b5e0358-dc74-448f-a08f-226ba4f0d1c1"
+}
+
+####
+
+PUT http://localhost:8000/api/v1/active_template/82eb06b7-0678-4ea2-8a94-3f59947fd77b/
+accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "template_id": "70e8d502-a16e-40d0-88e0-226c63fb751c"
+}
+
+####
+
+DELETE http://localhost:8000/api/v1/active_template/82eb06b7-0678-4ea2-8a94-3f59947fd77b/
+accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{access_token}}

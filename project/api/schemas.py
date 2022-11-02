@@ -302,6 +302,23 @@ class User(BaseModel):
 	password: constr(min_length=1) = Field(title="password", description="The password of the user")
 	name: constr(min_length=1)
 	is_active: Optional[bool] = True
+	client_id: Optional[str] = None
+
+	class Config:
+		orm_mode = True
+
+
+class Create_Update_Active_Template(BaseModel):
+	user_id: Optional[int] = Field(title="user_id", description="The id of the user")
+	template_id: str = Field(title="template_id", description="The template_id of the template")
+
+	class Config:
+		orm_mode = True
+
+
+class Active_Template(BaseModel):
+	user_id: int = Field(title="user_id", description="The id of the user")
+	template_id: str = Field(title="template_id", description="The id of the template")
 
 	class Config:
 		orm_mode = True

@@ -4,9 +4,9 @@ from passlib.handlers.bcrypt import bcrypt
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .models import *
+from .models import User, Active_Template
 # from .models import Template_Content
-from .schemas import User as UserSchema
+from .schemas import User as UserSchema, Create_Update_Active_Template as Create_Update_Active_TemplateSchema
 
 
 ###
@@ -62,4 +62,51 @@ class User_DAL:
 		return user
 
 
-### Template services ###
+### Template configs ###
+
+class Active_Template_DAL:
+	@classmethod
+	def create_active_template(cls, user_id: int, create_active_template: Create_Update_Active_TemplateSchema,
+	                           session: AsyncSession) -> Active_Template:
+		at = Active_Template()
+		at.template_id = create_active_template.template_id
+		at.user_id = user_id
+		session.add(at)
+		return at
+
+	@classmethod
+	async def update_active_template(cls, user_id: int, active_template_id: str,
+	                                 updated_active_template: Create_Update_Active_TemplateSchema,
+	                                 session: AsyncSession) -> Active_Template:
+		at = await session.execute(
+			select(Active_Template).where(Active_Template.user_id == user_id)
+			.where(Active_Template.id == active_template_id))
+		active_template = at.scalars().first()
+
+		if not active_template:
+			return False
+
+		active_template.template_id = updated_active_template.template_id
+		return active_template
+
+	@classmethod
+	async def get_active_template(cls, user_id: int, session: AsyncSession) -> Union[bool, Active_Template]:
+		at = await session.execute(select(Active_Template).where(Active_Template.user_id == user_id))
+		active_template = at.scalars().first()
+		if not active_template:
+			return False
+		return active_template
+
+	@classmethod
+	async def delete_active_template(cls, user_id: int, active_template_id: str, session: AsyncSession) -> Union[
+		bool, Active_Template]:
+		at = await session.execute(
+			select(Active_Template).where(Active_Template.user_id == user_id)
+			.where(Active_Template.id == active_template_id))
+		active_template = at.scalars().first()
+
+		if not active_template:
+			return False
+
+		await session.delete(active_template)
+		return True

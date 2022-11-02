@@ -16,6 +16,7 @@ class User(Base):
 	username = Column(String, unique=True, index=True)
 	name = Column(String, nullable=True)
 	hashed_password = Column(String, nullable=True)
+	client_id = Column(String, nullable=True)
 	is_active = Column(Boolean, default=True)
 	created_at = Column(DateTime(timezone=True),
 	                    nullable=False, default=func.now())
@@ -176,3 +177,21 @@ class Template_Config(Base):
 
 	def __repr__(self) -> str:
 		return f"<Template Config: {self.id} -  {self.template_config}>"
+
+
+class Active_Template(Base):
+	__tablename__ = "active_templates"
+	__table_args__ = (
+		UniqueConstraint('user_id', 'template_id',
+		                 name='unique_active_template'),
+		{"schema": "bot"}
+	)
+
+	id = Column(String(128), primary_key=True, default=func.uuid_generate_v4())
+	user_id = Column(Integer, ForeignKey("bot.users.id"))
+	template_id = Column(String, ForeignKey("bot.templates.id"))
+	created_at = Column(DateTime(timezone=True), nullable=False, default=func.now())
+	updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
+
+	def __repr__(self) -> str:
+		return f"<Active Template: {self.id} -  {self.template_id}>"
