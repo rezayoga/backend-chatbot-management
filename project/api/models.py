@@ -110,7 +110,7 @@ class Template(Base):
 	template_description = Column(Text, nullable=True)
 	division_id = Column(String(128), nullable=True)
 	is_deleted = Column(Boolean, default=False)
-	owner_id = Column(Integer, nullable=True)
+	owner_id = Column(Integer, ForeignKey("bot.user.id"))
 	updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
 	template_contents = relationship(
 		"Template_Content", backref="template_content", cascade="all, delete-orphan")
