@@ -130,7 +130,6 @@ dmypy.json
 .pyre/
 
 *.db
-.github
 
 node_modules/
 

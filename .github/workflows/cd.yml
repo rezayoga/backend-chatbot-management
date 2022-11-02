@@ -1,0 +1,42 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  cd-pipeline:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_CREDENTIAL_HOSTNAME }}
+          username: ${{ secrets.SERVER_CREDENTIAL_USERNAME }}
+          key: ${{ secrets.SERVER_CREDENTIAL_PRIVATE_KEY }}
+          port: 2211
+          script_stop: true
+          debug: true
+          script: |
+            cd /home/rezayogaswara/python_projects/backend-chatbot-management
+            pwd
+            ls -ahl
+            echo ----------------------------------------------
+            git pull origin main
+            echo ----------------------------------------------
+            source venv/bin/activate
+            pip install --upgrade pip
+            pip install -r requirements.txt
+            echo ----------------------------------------------
+            # alembic revision --autogenerate -m "migration"
+            # alembic upgrade head
+            echo ----------------------------------------------
+            sudo systemctl stop chatbotmanagement
+            sudo systemctl start chatbotmanagement
+            sudo systemctl status chatbotmanagement
