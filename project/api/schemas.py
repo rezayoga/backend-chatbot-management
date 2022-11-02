@@ -290,8 +290,8 @@ class User_Login(BaseModel):
 		orm_mode = True
 		schema_extra = {
 			"example": {
-				"username": "reza",
-				"password": "reza"
+				"username": "a",
+				"password": "a"
 			}
 		}
 
