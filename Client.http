@@ -75,15 +75,13 @@ Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
 {
-  "client_id": "string",
-  "channel_id": "string",
-  "account_id": "string",
-  "account_alias": "string",
-  "template_name": "string",
-  "template_description": "string",
-  "division_id": "string",
-  "is_deleted": false,
-  "owner_id": 0
+  "client_id": "1",
+  "channel_id": "2",
+  "account_id": "3",
+  "account_alias": "4",
+  "template_name": "5",
+  "template_description": "6",
+  "division_id": "7"
 }
 
 ####

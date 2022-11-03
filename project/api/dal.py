@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .models import User, Active_Template, Template
 # from .models import Template_Content
 from .schemas import User as UserSchema, Active_Template_Create_Update as Create_Update_Active_TemplateSchema, \
-	Template as TemplateSchema
+	Template as TemplateSchema, TemplateUpdate as TemplateUpdateSchema
 
 
 ###
@@ -159,7 +159,7 @@ class Template_DAL:
 		return template
 
 	@classmethod
-	async def update_template(cls, user_id: int, template_id: int, updated_template: TemplateSchema,
+	async def update_template(cls, user_id: int, template_id: int, updated_template: TemplateUpdateSchema,
 	                          session: AsyncSession) -> Union[bool, Template]:
 		template = await session.execute(select(Template).where(Template.id == template_id)
 		                                 .where(Template.owner_id == user_id)
