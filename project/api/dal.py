@@ -188,5 +188,5 @@ class Template_DAL:
 		if not t:
 			return False
 
-		t.is_deleted = True
+		await session.delete(t)
 		return t
