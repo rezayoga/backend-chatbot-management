@@ -4,9 +4,10 @@ from passlib.handlers.bcrypt import bcrypt
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .models import User, Active_Template
+from .models import User, Active_Template, Template
 # from .models import Template_Content
-from .schemas import User as UserSchema, Create_Update_Active_Template as Create_Update_Active_TemplateSchema
+from .schemas import User as UserSchema, Active_Template_Create_Update as Create_Update_Active_TemplateSchema, \
+	Template as TemplateSchema
 
 
 ###
@@ -110,3 +111,92 @@ class Active_Template_DAL:
 
 		await session.delete(active_template)
 		return True
+
+
+class Template_DAL:
+	@classmethod
+	async def get_templates(cls, session: AsyncSession) -> Union[bool, List[Template]]:
+		templates = await session.execute(select(Template))
+		t = templates.scalars().all()
+		if not t:
+			return False
+		return t
+
+	@classmethod
+	async def get_template_by_template_id(cls, user_id: str, template_id: str, session: AsyncSession) -> Union[
+		bool, Template]:
+		template = await session.execute(
+			select(Template).where(Template.id == template_id).where(Template.owner_id == user_id).where(
+				Template.is_deleted == False))
+		t = template.scalars().first()
+		if not t:
+			return False
+		return t
+
+	@classmethod
+	async def get_template_by_user_id(cls, user_id: int, session: AsyncSession) -> Union[bool, Template]:
+		template = await session.execute(
+			select(Template).where(Template.owner_id == user_id).where(Template.is_deleted == False))
+		t = template.scalars().all()
+		if not t:
+			return False
+		return t
+
+	@classmethod
+	def create_template(cls, user_id: int, created_template: TemplateSchema, session: AsyncSession) -> Template:
+		template = Template()
+		template.owner_id = user_id
+		template.client_id = created_template.client_id
+		template.template_name = created_template.template_name
+		template.template_description = created_template.template_description
+		template.is_deleted = False
+		template.channel_id = created_template.channel_id
+		template.account_id = created_template.account_id
+		template.account_alias = created_template.account_alias
+		template.division_id = created_template.division_id
+
+		session.add(template)
+		return template
+
+	@classmethod
+	async def update_template(cls, user_id: int, template_id: int, updated_template: TemplateSchema,
+	                          session: AsyncSession) -> Union[bool, Template]:
+		template = await session.execute(select(Template).where(Template.id == template_id)
+		                                 .where(Template.owner_id == user_id)
+		                                 .where(Template.is_deleted == False))
+		t = template.scalars().first()
+
+		if not t:
+			return False
+
+		if updated_template.client_id:
+			t.client_id = updated_template.client_id
+		if updated_template.template_name:
+			t.template_name = updated_template.template_name
+		if updated_template.template_description:
+			t.template_description = updated_template.template_description
+		if updated_template.channel_id:
+			t.channel_id = updated_template.channel_id
+		if updated_template.account_id:
+			t.account_id = updated_template.account_id
+		if updated_template.account_alias:
+			t.account_alias = updated_template.account_alias
+		if updated_template.division_id:
+			t.division_id = updated_template.division_id
+		if updated_template.is_deleted:
+			t.is_deleted = updated_template.is_deleted
+
+		return t
+
+	@classmethod
+	async def delete_template(cls, user_id: int, template_id: int, session: AsyncSession) -> Union[bool, Template]:
+		template = await session.execute(
+			select(Template).where(Template.id == template_id).where(Template.owner_id == user_id)
+			.where(Template.is_deleted == False))
+		t = template.scalars().first()
+
+		if not t:
+			return False
+
+		t.is_deleted = True
+		return t

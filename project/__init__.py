@@ -27,8 +27,8 @@ def create_app() -> FastAPI:
 		              "name": "Reza Yogaswara",
 		              "url": "https://me.rezayogaswara.dev/",
 		              "email": "reza.yoga@gmail.com",
-	              },
-	              servers=[{"url": "https://chatbotmanagement.rezayogaswara.dev/", "description": "Development"}]
+	              }
+	              # servers=[{"url": "https://chatbotmanagement.rezayogaswara.dev/", "description": "Development"}]
 	              )
 
 	# Salt to your taste

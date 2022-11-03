@@ -45,3 +45,59 @@ DELETE http://localhost:8000/api/v1/active_template/82eb06b7-0678-4ea2-8a94-3f59
 accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{access_token}}
+
+
+##### template
+
+
+POST http://localhost:8000/api/v1/templates/
+accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "client_id": "string",
+  "channel_id": "string",
+  "account_id": "string",
+  "account_alias": "string",
+  "template_name": "string",
+  "template_description": "string",
+  "division_id": "string",
+  "is_deleted": true,
+  "owner_id": 0
+}
+
+####
+
+PUT http://localhost:8000/api/v1/templates/eec45d67-5d59-44de-9f2a-3c79420b9707/
+accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "client_id": "string",
+  "channel_id": "string",
+  "account_id": "string",
+  "account_alias": "string",
+  "template_name": "string",
+  "template_description": "string",
+  "division_id": "string",
+  "is_deleted": false,
+  "owner_id": 0
+}
+
+####
+
+DELETE http://localhost:8000/api/v1/templates/ef8587b7-7e28-47b0-8aca-41eb3157e815/
+accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+####
+
+GET http://localhost:8000/api/v1/templates/eec45d67-5d59-44de-9f2a-3c79420b9707/
+accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+####
