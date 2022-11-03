@@ -67,20 +67,20 @@ class User_DAL:
 
 class Active_Template_DAL:
 	@classmethod
-	def create_active_template(cls, user_id: int, create_active_template: Create_Update_Active_TemplateSchema,
+	def create_active_template(cls, create_active_template: Create_Update_Active_TemplateSchema,
 	                           session: AsyncSession) -> Active_Template:
 		at = Active_Template()
 		at.template_id = create_active_template.template_id
-		at.user_id = user_id
+		at.user_id = create_active_template.user_id
 		session.add(at)
 		return at
 
 	@classmethod
-	async def update_active_template(cls, user_id: int, active_template_id: str,
+	async def update_active_template(cls, active_template_id: str,
 	                                 updated_active_template: Create_Update_Active_TemplateSchema,
 	                                 session: AsyncSession) -> Active_Template:
 		at = await session.execute(
-			select(Active_Template).where(Active_Template.user_id == user_id)
+			select(Active_Template)
 			.where(Active_Template.id == active_template_id))
 		active_template = at.scalars().first()
 
@@ -91,18 +91,18 @@ class Active_Template_DAL:
 		return active_template
 
 	@classmethod
-	async def get_active_template(cls, user_id: int, session: AsyncSession) -> Union[bool, Active_Template]:
-		at = await session.execute(select(Active_Template).where(Active_Template.user_id == user_id))
-		active_template = at.scalars().first()
+	async def get_active_template(cls, session: AsyncSession) -> Union[bool, Active_Template]:
+		at = await session.execute(select(Active_Template))
+		active_template = at.scalars().all()
 		if not active_template:
 			return False
 		return active_template
 
 	@classmethod
-	async def delete_active_template(cls, user_id: int, active_template_id: str, session: AsyncSession) -> Union[
+	async def delete_active_template(cls, active_template_id: str, session: AsyncSession) -> Union[
 		bool, Active_Template]:
 		at = await session.execute(
-			select(Active_Template).where(Active_Template.user_id == user_id)
+			select(Active_Template)
 			.where(Active_Template.id == active_template_id))
 		active_template = at.scalars().first()
 
@@ -116,17 +116,18 @@ class Active_Template_DAL:
 class Template_DAL:
 	@classmethod
 	async def get_templates(cls, session: AsyncSession) -> Union[bool, List[Template]]:
-		templates = await session.execute(select(Template))
+		templates = await session.execute(select(Template).where(
+				Template.is_deleted == False))
 		t = templates.scalars().all()
 		if not t:
 			return False
 		return t
 
 	@classmethod
-	async def get_template_by_template_id(cls, user_id: str, template_id: str, session: AsyncSession) -> Union[
+	async def get_template_by_template_id(cls, template_id: str, session: AsyncSession) -> Union[
 		bool, Template]:
 		template = await session.execute(
-			select(Template).where(Template.id == template_id).where(Template.owner_id == user_id).where(
+			select(Template).where(Template.id == template_id).where(
 				Template.is_deleted == False))
 		t = template.scalars().first()
 		if not t:
@@ -134,18 +135,8 @@ class Template_DAL:
 		return t
 
 	@classmethod
-	async def get_template_by_user_id(cls, user_id: int, session: AsyncSession) -> Union[bool, Template]:
-		template = await session.execute(
-			select(Template).where(Template.owner_id == user_id).where(Template.is_deleted == False))
-		t = template.scalars().all()
-		if not t:
-			return False
-		return t
-
-	@classmethod
-	def create_template(cls, user_id: int, created_template: TemplateSchema, session: AsyncSession) -> Template:
+	def create_template(cls, created_template: TemplateSchema, session: AsyncSession) -> Template:
 		template = Template()
-		template.owner_id = user_id
 		template.client_id = created_template.client_id
 		template.template_name = created_template.template_name
 		template.template_description = created_template.template_description
@@ -159,12 +150,13 @@ class Template_DAL:
 		return template
 
 	@classmethod
-	async def update_template(cls, user_id: int, template_id: int, updated_template: TemplateUpdateSchema,
+	async def update_template(cls, template_id: str, updated_template: TemplateUpdateSchema,
 	                          session: AsyncSession) -> Union[bool, Template]:
 		template = await session.execute(select(Template).where(Template.id == template_id)
-		                                 .where(Template.owner_id == user_id)
 		                                 .where(Template.is_deleted == False))
 		t = template.scalars().first()
+
+
 
 		if not t:
 			return False
@@ -183,15 +175,13 @@ class Template_DAL:
 			t.account_alias = updated_template.account_alias
 		if updated_template.division_id:
 			t.division_id = updated_template.division_id
-		if updated_template.is_deleted:
-			t.is_deleted = updated_template.is_deleted
 
 		return t
 
 	@classmethod
-	async def delete_template(cls, user_id: int, template_id: int, session: AsyncSession) -> Union[bool, Template]:
+	async def delete_template(cls, template_id: str, session: AsyncSession) -> Union[bool, Template]:
 		template = await session.execute(
-			select(Template).where(Template.id == template_id).where(Template.owner_id == user_id)
+			select(Template).where(Template.id == template_id)
 			.where(Template.is_deleted == False))
 		t = template.scalars().first()
 

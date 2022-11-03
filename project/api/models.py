@@ -11,7 +11,7 @@ metadata = Base.metadata
 class User(Base):
 	__tablename__ = "users"
 	__table_args__ = {"schema": "bot"}
-	id = Column(Integer, primary_key=True, autoincrement=True)
+	id = Column(String, primary_key=True)
 	email = Column(String, unique=True, index=True)
 	username = Column(String, unique=True, index=True)
 	name = Column(String, nullable=True)
@@ -21,7 +21,6 @@ class User(Base):
 	created_at = Column(DateTime(timezone=True),
 	                    nullable=False, default=func.now())
 	updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
-	templates = relationship("Template", backref="template_owner", cascade="all, delete-orphan")
 
 	def __repr__(self):
 		return f"{self.name} <{self.email}>"
@@ -111,7 +110,6 @@ class Template(Base):
 	template_description = Column(Text, nullable=True)
 	division_id = Column(String(128), nullable=True)
 	is_deleted = Column(Boolean, default=False)
-	owner_id = Column(Integer, ForeignKey("bot.users.id"))
 	updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
 	template_contents = relationship(
 		"Template_Content", backref="template_content", cascade="all, delete-orphan")
@@ -166,29 +164,16 @@ class Outbound(Base):
 		return f"<Outbound: {self.queue} - {self.data} - {self.template_id} - {self.template_content_id}>"
 
 
-class Template_Config(Base):
-	__tablename__ = "template_configs"
-	__table_args__ = {"schema": "bot"}
-
-	id = Column(String(128), primary_key=True, default=func.uuid_generate_v4())
-	template_config = Column(JSONB, unique=True, nullable=False)
-	created_at = Column(DateTime(timezone=True), nullable=False, default=func.now())
-	updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
-
-	def __repr__(self) -> str:
-		return f"<Template Config: {self.id} -  {self.template_config}>"
-
-
 class Active_Template(Base):
 	__tablename__ = "active_templates"
 	__table_args__ = (
-		UniqueConstraint('user_id', 'template_id',
-		                 name='unique_active_template'),
+		# UniqueConstraint('user_id', 'template_id',
+		#                  name='unique_active_template'),
 		{"schema": "bot"}
 	)
 
 	id = Column(String(128), primary_key=True, default=func.uuid_generate_v4())
-	user_id = Column(Integer, ForeignKey("bot.users.id"))
+	user_id = Column(String, nullable=False, unique=True)
 	template_id = Column(String, ForeignKey("bot.templates.id"))
 	created_at = Column(DateTime(timezone=True), nullable=False, default=func.now())
 	updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())

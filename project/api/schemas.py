@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date
 from typing import Optional, List
 
 from pydantic import constr, BaseModel, Field, EmailStr
@@ -309,7 +309,7 @@ class User(BaseModel):
 
 
 class Active_Template_Create_Update(BaseModel):
-	user_id: Optional[int] = Field(title="user_id", description="The id of the user")
+	user_id: Optional[str] = Field(title="user_id", description="The id of the user")
 	template_id: str = Field(title="template_id", description="The template_id of the template")
 
 	class Config:
@@ -332,21 +332,10 @@ class Template(BaseModel):
 	template_name: Optional[str] = None
 	template_description: Optional[str] = None
 	division_id: Optional[str] = None
-	is_deleted: Optional[bool] = None
-	owner_id: Optional[int] = None
+	is_deleted: Optional[bool] = False
 
 	class Config:
 		orm_mode = True
-
-
-# set denylist enabled to True
-# you can set to check access or refresh token or even both of them
-class JWT_Settings(BaseModel):
-	authjwt_secret_key: str = "d4d2b169f9c91008caf5cb68c9e4125a16bf139469de01f98fe8ac03ed8f8d0a"
-	authjwt_denylist_enabled: bool = True
-	authjwt_denylist_token_checks: set = {"access", "refresh"}
-	access_token_expires: int = timedelta(minutes=15)
-	refresh_token_expires: int = timedelta(days=30)
 
 
 class TemplateUpdate:

@@ -32,7 +32,7 @@ def create_app() -> FastAPI:
 	              )
 
 	# Salt to your taste
-	ALLOWED_ORIGINS = 'https://localhost:5173'  # or 'foo.com', etc.
+	ALLOWED_ORIGINS = 'http://localhost'  # or 'foo.com', etc.
 
 	# handle CORS preflight requests
 	@app.options('/{rest_of_path:path}')
