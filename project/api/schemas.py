@@ -308,8 +308,15 @@ class User(BaseModel):
 		orm_mode = True
 
 
-class Active_Template_Create_Update(BaseModel):
-	user_id: Optional[str] = Field(title="user_id", description="The id of the user")
+class Active_Template_Create(BaseModel):
+	user_id: str = Field(title="user_id", description="The user_id of the user")
+	template_id: str = Field(title="template_id", description="The template_id of the template")
+
+	class Config:
+		orm_mode = True
+
+
+class Active_Template_Update(BaseModel):
 	template_id: str = Field(title="template_id", description="The template_id of the template")
 
 	class Config:
@@ -319,6 +326,10 @@ class Active_Template_Create_Update(BaseModel):
 class Active_Template(BaseModel):
 	user_id: int = Field(title="user_id", description="The id of the user")
 	template_id: str = Field(title="template_id", description="The id of the template")
+	client_id: Optional[str] = None
+	channel_id: Optional[str] = None
+	account_id: Optional[str] = None
+	account_alias: Optional[str] = None
 
 	class Config:
 		orm_mode = True

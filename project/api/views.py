@@ -7,7 +7,8 @@ from starlette.responses import JSONResponse
 
 from project.api.dal import *
 from . import api_router
-from .schemas import Template as TemplateSchema
+from .schemas import Template as TemplateSchema, Active_Template_Create as Active_Template_CreateSchema, \
+	Active_Template_Update as Active_Template_UpdateSchema
 from ..database import get_session
 
 logger = logging.getLogger(__name__)
@@ -40,10 +41,10 @@ def incorrect_request_exception(message: str):
 
 
 @api_router.post("/active_template/", tags=["active_template"])
-async def create_active_template(created_active_template: Create_Update_Active_TemplateSchema,
+async def create_active_template(created_active_template: Active_Template_CreateSchema,
 
                                  session: AsyncSession = Depends(get_session)):
-	template = Active_Template_DAL.create_active_template(created_active_template, session)
+	template = await Active_Template_DAL.create_active_template(created_active_template, session)
 	try:
 		await session.commit()
 		return JSONResponse(status_code=200, content={"message": "Active template created successfully",
@@ -64,7 +65,7 @@ async def get_active_template(session: AsyncSession = Depends(get_session)):
 
 
 @api_router.put("/active_template/{active_template_id}/", tags=["active_template"])
-async def update_active_template(active_template_id: str, updated_active_template: Create_Update_Active_TemplateSchema,
+async def update_active_template(active_template_id: str, updated_active_template: Active_Template_UpdateSchema,
                                  session: AsyncSession = Depends(get_session)):
 	active_template = await Active_Template_DAL.update_active_template(active_template_id,
 	                                                                   updated_active_template, session)

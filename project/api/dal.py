@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import User, Active_Template, Template
 # from .models import Template_Content
-from .schemas import User as UserSchema, Active_Template_Create_Update as Create_Update_Active_TemplateSchema, \
+from .schemas import User as UserSchema, Active_Template_Update as Create_Update_Active_TemplateSchema, \
 	Template as TemplateSchema, TemplateUpdate as TemplateUpdateSchema
 
 
@@ -67,11 +67,23 @@ class User_DAL:
 
 class Active_Template_DAL:
 	@classmethod
-	def create_active_template(cls, create_active_template: Create_Update_Active_TemplateSchema,
-	                           session: AsyncSession) -> Active_Template:
+	async def create_active_template(cls, create_active_template: Create_Update_Active_TemplateSchema,
+	                                 session: AsyncSession) -> Active_Template:
+
+		template = await session.execute(
+			select(Template).where(Template.id == create_active_template.template_id).where(
+				Template.is_deleted == False))
+		t = template.scalars().first()
+		if not t:
+			return False
+
 		at = Active_Template()
 		at.template_id = create_active_template.template_id
 		at.user_id = create_active_template.user_id
+		at.client_id = t.client_id
+		at.channel_id = t.channel_id
+		at.account_id = t.account_id
+		at.account_alias = t.account_alias
 		session.add(at)
 		return at
 
@@ -79,6 +91,14 @@ class Active_Template_DAL:
 	async def update_active_template(cls, active_template_id: str,
 	                                 updated_active_template: Create_Update_Active_TemplateSchema,
 	                                 session: AsyncSession) -> Active_Template:
+
+		template = await session.execute(
+			select(Template).where(Template.id == updated_active_template.template_id).where(
+				Template.is_deleted == False))
+		t = template.scalars().first()
+		if not t:
+			return False
+
 		at = await session.execute(
 			select(Active_Template)
 			.where(Active_Template.id == active_template_id))
@@ -88,6 +108,10 @@ class Active_Template_DAL:
 			return False
 
 		active_template.template_id = updated_active_template.template_id
+		active_template.client_id = t.client_id
+		active_template.channel_id = t.channel_id
+		active_template.account_id = t.account_id
+		active_template.account_alias = t.account_alias
 		return active_template
 
 	@classmethod
@@ -117,7 +141,7 @@ class Template_DAL:
 	@classmethod
 	async def get_templates(cls, session: AsyncSession) -> Union[bool, List[Template]]:
 		templates = await session.execute(select(Template).where(
-				Template.is_deleted == False))
+			Template.is_deleted == False))
 		t = templates.scalars().all()
 		if not t:
 			return False
@@ -155,8 +179,6 @@ class Template_DAL:
 		template = await session.execute(select(Template).where(Template.id == template_id)
 		                                 .where(Template.is_deleted == False))
 		t = template.scalars().first()
-
-
 
 		if not t:
 			return False

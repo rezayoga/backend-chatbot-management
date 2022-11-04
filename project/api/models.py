@@ -1,5 +1,5 @@
 # coding: utf-8
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, func, Text, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, String, Boolean, DateTime, func, Text, ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
@@ -110,6 +110,7 @@ class Template(Base):
 	template_description = Column(Text, nullable=True)
 	division_id = Column(String(128), nullable=True)
 	is_deleted = Column(Boolean, default=False)
+	owner_id = Column(String, nullable=True)
 	updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
 	template_contents = relationship(
 		"Template_Content", backref="template_content", cascade="all, delete-orphan")
@@ -167,13 +168,16 @@ class Outbound(Base):
 class Active_Template(Base):
 	__tablename__ = "active_templates"
 	__table_args__ = (
-		# UniqueConstraint('user_id', 'template_id',
-		#                  name='unique_active_template'),
+		UniqueConstraint('client_id', 'channel_id', 'account_id', 'account_alias',
+		                 name='unique_active_template'),
 		{"schema": "bot"}
 	)
 
 	id = Column(String(128), primary_key=True, default=func.uuid_generate_v4())
-	user_id = Column(String, nullable=False, unique=True)
+	client_id = Column(String, nullable=True)
+	channel_id = Column(String, nullable=True)
+	account_id = Column(String, nullable=True)
+	account_alias = Column(String, nullable=True)
 	template_id = Column(String, ForeignKey("bot.templates.id"))
 	created_at = Column(DateTime(timezone=True), nullable=False, default=func.now())
 	updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
