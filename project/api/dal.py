@@ -1,5 +1,6 @@
-from typing import List, Union
+from typing import List, Union, Any
 
+from faker import Faker
 from passlib.handlers.bcrypt import bcrypt
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -123,6 +124,10 @@ class Active_Template_DAL:
 		return active_template
 
 	@classmethod
+	def get_active_templates(cls) -> Any:
+		return select(Active_Template)
+
+	@classmethod
 	async def delete_active_template(cls, active_template_id: str, session: AsyncSession) -> Union[
 		bool, Active_Template]:
 		at = await session.execute(
@@ -139,13 +144,9 @@ class Active_Template_DAL:
 
 class Template_DAL:
 	@classmethod
-	async def get_templates(cls, session: AsyncSession) -> Union[bool, List[Template]]:
-		templates = await session.execute(select(Template).where(
-			Template.is_deleted == False))
-		t = templates.scalars().all()
-		if not t:
-			return False
-		return t
+	def get_templates(cls) -> Any:
+		return select(Template).where(
+			Template.is_deleted == False)
 
 	@classmethod
 	async def get_template_by_template_id(cls, template_id: str, session: AsyncSession) -> Union[
@@ -212,3 +213,19 @@ class Template_DAL:
 
 		await session.delete(t)
 		return t
+
+	@classmethod
+	def populate_templates(cls, count: int, session):
+
+		fake = Faker(['it_IT', 'en_US', 'ja_JP', 'id_ID'])
+		for i in range(count):
+			template = Template()
+			template.client_id = fake.name()
+			template.template_name = fake.name()
+			template.template_description = fake.text()
+			template.is_deleted = False
+			template.channel_id = fake.name()
+			template.account_id = fake.name()
+			template.account_alias = fake.name()
+			template.division_id = fake.name()
+			session.add(template)

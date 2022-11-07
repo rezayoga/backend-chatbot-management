@@ -2,13 +2,16 @@ import logging
 
 from fastapi import HTTPException, Depends
 from fastapi.encoders import jsonable_encoder
+from fastapi_pagination.ext.async_sqlalchemy import paginate
 from rich.console import Console
 from starlette.responses import JSONResponse
 
 from project.api.dal import *
 from . import api_router
+from .pagination import JsonApiPage
 from .schemas import Template as TemplateSchema, Active_Template_Create as Active_Template_CreateSchema, \
-	Active_Template_Update as Active_Template_UpdateSchema
+	Active_Template_Update as Active_Template_UpdateSchema, Active_Template as Active_TemplateSchema, \
+	Active_Template_Paginated as Active_Template_PaginatedSchema
 from ..database import get_session
 
 logger = logging.getLogger(__name__)
@@ -64,6 +67,12 @@ async def get_active_template(session: AsyncSession = Depends(get_session)):
 	return active_template
 
 
+@api_router.get("/active_template/display/all/", tags=["active_template"],
+                response_model=JsonApiPage[Active_Template_PaginatedSchema])
+async def get_active_template(session: AsyncSession = Depends(get_session)):
+	return await paginate(session, Active_Template_DAL.get_active_templates())
+
+
 @api_router.put("/active_template/{active_template_id}/", tags=["active_template"])
 async def update_active_template(active_template_id: str, updated_active_template: Active_Template_UpdateSchema,
                                  session: AsyncSession = Depends(get_session)):
@@ -115,6 +124,18 @@ async def create_template(created_template: TemplateSchema,
 		raise incorrect_request_exception(jsonable_encoder(ex))
 
 
+@api_router.get("/templates/populate/", tags=["templates"])
+async def populate_templates(session: AsyncSession = Depends(get_session)):
+	template = Template_DAL.populate_templates(25, session)
+	try:
+		await session.commit()
+		return JSONResponse(status_code=200, content={"message": "Templates populated successfully",
+		                                              "body": jsonable_encoder(template)})
+	except Exception as ex:
+		await session.rollback()
+		raise incorrect_request_exception(jsonable_encoder(ex))
+
+
 @api_router.get("/templates/{template_id}/", tags=["templates"])
 async def get_template_by_template_id(template_id: str,
                                       session: AsyncSession = Depends(get_session)):
@@ -126,14 +147,9 @@ async def get_template_by_template_id(template_id: str,
 	return template
 
 
-@api_router.get("/templates/", tags=["templates"])
+@api_router.get("/templates/display/all/", tags=["templates"], response_model=JsonApiPage[TemplateSchema])
 async def get_templates(session: AsyncSession = Depends(get_session)):
-	templates = await Template_DAL.get_templates(session)
-
-	# if templates is None or templates == False:
-	# 	raise not_found_exception("Templates not found")
-
-	return templates
+	return await paginate(session, Template_DAL.get_templates())
 
 
 @api_router.put("/templates/{template_id}/", tags=["templates"])

@@ -334,6 +334,16 @@ class Active_Template(BaseModel):
 	class Config:
 		orm_mode = True
 
+class Active_Template_Paginated(BaseModel):
+	template_id: str = Field(title="template_id", description="The id of the template")
+	client_id: Optional[str] = None
+	channel_id: Optional[str] = None
+	account_id: Optional[str] = None
+	account_alias: Optional[str] = None
+
+	class Config:
+		orm_mode = True
+
 
 class Template(BaseModel):
 	client_id: Optional[str] = None

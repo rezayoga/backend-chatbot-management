@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 from project.celery_utils import create_celery  # new
 
 logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
-
+from fastapi_pagination import Page, paginate, add_pagination
 # get root logger
 logger = logging.getLogger(__name__)  # __name__ = "project"
 
@@ -30,6 +30,15 @@ def create_app() -> FastAPI:
 	              }
 	              # servers=[{"url": "https://chatbotmanagement.rezayogaswara.dev/", "description": "Development"}]
 	              )
+
+	# async def catch_exceptions_middleware(request: Request, call_next):
+	# 	try:
+	# 		return await call_next(request)
+	# 	except Exception:
+	# 		# you probably want some kind of logging here
+	# 		return Response("Internal server error", status_code=500)
+	#
+	# app.middleware('http')(catch_exceptions_middleware)
 
 	# Salt to your taste
 	ALLOWED_ORIGINS = 'http://localhost'  # or 'foo.com', etc.
@@ -98,4 +107,5 @@ def create_app() -> FastAPI:
 	async def root():
 		return {"message": "App started successfully"}
 
+	add_pagination(app)
 	return app
