@@ -56,18 +56,8 @@ async def create_active_template(created_active_template: Active_Template_Create
 		raise incorrect_request_exception(jsonable_encoder(ex))
 
 
-@api_router.get("/active_templates/", tags=["active_templates"])
-async def get_active_templates(session: AsyncSession = Depends(get_session)):
-	active_template = await Active_Template_DAL.get_active_template(session)
-
-	if active_template is None or active_template == False:
-		raise not_found_exception("Active Template not found")
-
-	return active_template
-
-
 @api_router.get("/active_templates/{active_template_id}/", tags=["active_templates"])
-async def get_active_template(active_template_id: str, session: AsyncSession = Depends(get_session)):
+async def get_active_template_by_active_template_id(active_template_id: str, session: AsyncSession = Depends(get_session)):
 	active_template = await Active_Template_DAL.get_active_template_by_id(active_template_id, session)
 
 	if active_template is None or active_template == False:
@@ -76,7 +66,7 @@ async def get_active_template(active_template_id: str, session: AsyncSession = D
 	return active_template
 
 
-@api_router.get("/active_templates/display/all/", tags=["active_templates"],
+@api_router.get("/active_templates/", tags=["active_templates"],
                 response_model=JsonApiPage[Active_Template_PaginatedSchema])
 async def get_active_template(session: AsyncSession = Depends(get_session)):
 	return await paginate(session, Active_Template_DAL.get_active_templates())
@@ -156,7 +146,7 @@ async def get_template_by_template_id(template_id: str,
 	return template
 
 
-@api_router.get("/templates/display/all/", tags=["templates"], response_model=JsonApiPage[TemplateSchema])
+@api_router.get("/templates/", tags=["templates"], response_model=JsonApiPage[TemplateSchema])
 async def get_templates(session: AsyncSession = Depends(get_session)):
 	return await paginate(session, Template_DAL.get_templates())
 
