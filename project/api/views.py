@@ -57,7 +57,7 @@ async def create_active_template(created_active_template: Active_Template_Create
 
 
 @api_router.get("/active_templates/", tags=["active_templates"])
-async def get_active_template(session: AsyncSession = Depends(get_session)):
+async def get_active_templates(session: AsyncSession = Depends(get_session)):
 	active_template = await Active_Template_DAL.get_active_template(session)
 
 	if active_template is None or active_template == False:
