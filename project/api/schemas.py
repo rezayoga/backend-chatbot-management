@@ -346,6 +346,7 @@ class Active_Template_Paginated(BaseModel):
 
 
 class Template(BaseModel):
+	id: str = Field(title="id", description="The id of the template")
 	client_id: Optional[str] = None
 	channel_id: Optional[str] = None
 	account_id: Optional[str] = None

@@ -10,8 +10,7 @@ from project.api.dal import *
 from . import api_router
 from .pagination import JsonApiPage
 from .schemas import Template as TemplateSchema, Active_Template_Create as Active_Template_CreateSchema, \
-	Active_Template_Update as Active_Template_UpdateSchema, Active_Template as Active_TemplateSchema, \
-	Active_Template_Paginated as Active_Template_PaginatedSchema
+	Active_Template_Update as Active_Template_UpdateSchema, Active_Template_Paginated as Active_Template_PaginatedSchema
 from ..database import get_session
 
 logger = logging.getLogger(__name__)
@@ -124,7 +123,7 @@ async def create_template(created_template: TemplateSchema,
 		raise incorrect_request_exception(jsonable_encoder(ex))
 
 
-@api_router.get("/templates/populate/", tags=["templates"])
+@api_router.get("/templates/populate/", tags=["templates"], include_in_schema=False)
 async def populate_templates(session: AsyncSession = Depends(get_session)):
 	template = Template_DAL.populate_templates(25, session)
 	try:
