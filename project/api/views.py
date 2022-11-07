@@ -42,7 +42,7 @@ def incorrect_request_exception(message: str):
 """ active_template """
 
 
-@api_router.post("/active_template/", tags=["active_template"])
+@api_router.post("/active_templates/", tags=["active_templates"])
 async def create_active_template(created_active_template: Active_Template_CreateSchema,
 
                                  session: AsyncSession = Depends(get_session)):
@@ -56,7 +56,7 @@ async def create_active_template(created_active_template: Active_Template_Create
 		raise incorrect_request_exception(jsonable_encoder(ex))
 
 
-@api_router.get("/active_template/", tags=["active_template"])
+@api_router.get("/active_templates/", tags=["active_templates"])
 async def get_active_template(session: AsyncSession = Depends(get_session)):
 	active_template = await Active_Template_DAL.get_active_template(session)
 
@@ -66,7 +66,7 @@ async def get_active_template(session: AsyncSession = Depends(get_session)):
 	return active_template
 
 
-@api_router.get("/active_template/{active_template_id}/", tags=["active_template"])
+@api_router.get("/active_templates/{active_template_id}/", tags=["active_templates"])
 async def get_active_template(active_template_id: str, session: AsyncSession = Depends(get_session)):
 	active_template = await Active_Template_DAL.get_active_template_by_id(active_template_id, session)
 
@@ -76,13 +76,13 @@ async def get_active_template(active_template_id: str, session: AsyncSession = D
 	return active_template
 
 
-@api_router.get("/active_template/display/all/", tags=["active_template"],
+@api_router.get("/active_templates/display/all/", tags=["active_templates"],
                 response_model=JsonApiPage[Active_Template_PaginatedSchema])
 async def get_active_template(session: AsyncSession = Depends(get_session)):
 	return await paginate(session, Active_Template_DAL.get_active_templates())
 
 
-@api_router.put("/active_template/{active_template_id}/", tags=["active_template"])
+@api_router.put("/active_templates/{active_template_id}/", tags=["active_templates"])
 async def update_active_template(active_template_id: str, updated_active_template: Active_Template_UpdateSchema,
                                  session: AsyncSession = Depends(get_session)):
 	active_template = await Active_Template_DAL.update_active_template(active_template_id,
@@ -100,7 +100,7 @@ async def update_active_template(active_template_id: str, updated_active_templat
 		raise incorrect_request_exception(jsonable_encoder(ex))
 
 
-@api_router.delete("/active_template/{active_template_id}/", tags=["active_template"])
+@api_router.delete("/active_templates/{active_template_id}/", tags=["active_templates"])
 async def delete_active_template(active_template_id: str,
                                  session: AsyncSession = Depends(get_session)):
 	active_template = await Active_Template_DAL.delete_active_template(active_template_id, session)
