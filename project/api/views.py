@@ -66,6 +66,16 @@ async def get_active_template(session: AsyncSession = Depends(get_session)):
 	return active_template
 
 
+@api_router.get("/active_template/{active_template_id}/", tags=["active_template"])
+async def get_active_template(active_template_id: str, session: AsyncSession = Depends(get_session)):
+	active_template = await Active_Template_DAL.get_active_template_by_id(active_template_id, session)
+
+	if active_template is None or active_template == False:
+		raise not_found_exception("Active Template not found")
+
+	return active_template
+
+
 @api_router.get("/active_template/display/all/", tags=["active_template"],
                 response_model=JsonApiPage[Active_Template_PaginatedSchema])
 async def get_active_template(session: AsyncSession = Depends(get_session)):

@@ -124,6 +124,17 @@ class Active_Template_DAL:
 		return active_template
 
 	@classmethod
+	async def get_active_template_by_id(cls, active_template_id: str, session: AsyncSession) -> Union[
+		bool, Active_Template]:
+		at = await session.execute(
+			select(Active_Template)
+			.where(Active_Template.id == active_template_id))
+		active_template = at.scalars().first()
+		if not active_template:
+			return False
+		return active_template
+
+	@classmethod
 	def get_active_templates(cls) -> Any:
 		return select(Active_Template)
 
